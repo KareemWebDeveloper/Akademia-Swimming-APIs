@@ -17,4 +17,8 @@ class Category extends Model
         return $this->belongsToMany(Branch::class, 'branch_category')->withPivot('price_per_session', 'duration' , 'price_per_1' , 'price_per_2'
         , 'price_per_4' , 'price_per_6' , 'price_per_8');
     }
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
 }

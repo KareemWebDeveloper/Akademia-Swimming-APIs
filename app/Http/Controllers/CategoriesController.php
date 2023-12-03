@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Branch;
 use App\Models\Category;
+use App\Models\Subscription;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -70,6 +71,13 @@ class CategoriesController extends Controller
             $branches = Branch::all(); // Retrieve all branches
             foreach ($branches as $branch) {
                 $branch->categories()->detach($ids);
+            }
+            // Update the category_id to null for subscriptions of the specific category
+            foreach ($ids as $categoryId) {
+                $category = Category::find($categoryId);
+                if ($category->subscriptions()->where('category_id', $categoryId)->exists()){
+                    Subscription::where('category_id', $categoryId)->update(['category_id' => null]);
+                }
             }
             Category::whereIn('id', $ids)->delete();
             return response()->json(['message' => 'deleted successfully'],200);
