@@ -121,10 +121,9 @@ class CoachesController extends Controller
             $failedDeletions = [];
 
             foreach ($coachIds as $coachId) {
-                $coach = Coach::with('subscriptions.customer', 'subscriptions.branch')
-                ->find($coachId); // Retrieve the coach model instance
+                $coach = Coach::with('subscriptions')->find($coachId); // Retrieve the coach model instance
                 if ($coach->subscriptions()->where('state', 'active')->exists()) {
-                    $subscriptions = $coach->subscriptions()->where('state', 'active')->get();
+                    $subscriptions = $coach->subscriptions()->with('customer','branch')->where('state', 'active')->get();
                     // Add coach's ID and subscriptions to failedDeletions array
                     $failedDeletions[] = [
                         'coach_id' => $coachId,
