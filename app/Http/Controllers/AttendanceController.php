@@ -33,8 +33,10 @@ class AttendanceController extends Controller
             $customers = Customer::whereHas('subscriptions', function ($query) use ($branchId) {
                 $query->where('state', 'active')->where('branch_id', $branchId);
             })->with(['subscriptions' => function ($query) use ($branchId) {
-                $query->where('state' , 'active')->where('branch_id', $branchId);
-            }])->get();
+                $query->where('state' , 'active')->where('branch_id', $branchId)->with(['coach' => function ($query) {
+                    $query->select('id', 'name');
+                }]);;
+            }])->get(['customer_name' , 'customer_phone' , 'last_attendance_date' , 'id']);
             return response()->json(['customers' => $customers],200);
         }
         else{

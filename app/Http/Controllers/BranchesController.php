@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Academy;
 use App\Models\Branch;
 use App\Models\Category;
 use App\Models\WorkingDay;
@@ -20,10 +21,10 @@ class BranchesController extends Controller
             return response()->json(['message' => 'unauthorized'],401);
         }
     }
-    public function getBranchWithCategories(Request $request , $branchId){
+    public function getBranchDetails(Request $request , $branchId){
         $user = $request->user();
         if($user->type == 'admin' || $user->type == 'Employee'){
-        $branch = Branch::with('categories' , 'workingDays')->find($branchId);
+        $branch = Branch::with('categories' , 'workingDays' , 'academies')->find($branchId);
         return response()->json(['branch' => $branch],200);
         }
         else{
@@ -48,6 +49,10 @@ class BranchesController extends Controller
             $validatedData = $request->validate([
                 'branch_name' => 'required|string|unique:branches,branch_name',
                 'working_days' => 'required|array',
+                'working_days.*.day' => 'required|string',
+                'working_days.*.start_time' => 'nullable',
+                'working_days.*.end_time' => 'nullable',
+                'academies' => 'required|array',
                 'categories' => 'required|array',
                 'categories.*.categoryId' => 'required|exists:categories,id',
                 'categories.*.duration' => 'required|numeric',
@@ -68,11 +73,17 @@ class BranchesController extends Controller
                     'session_prices' => $categoryData['session_prices'],
                 ]);
             }
+            foreach ($validatedData['academies'] as $academy) {
+                $academy = Academy::find($academy);
+                $branch->academies()->attach($academy);
+            }
 
-            foreach ($validatedData['working_days'] as $day) {
+            foreach ($validatedData['working_days'] as $schedule) {
                 $workingDay = WorkingDay::create([
                     'branch_id' => $branch->id,
-                    'day' => $day
+                    'day' => $schedule['day'],
+                    'start_time' => $schedule['start_time'],
+                    'end_time' => $schedule['end_time']
                 ]);
             }
             return response()->json(['message' => 'Branch created and attached to categories successfully']);
@@ -90,6 +101,7 @@ public function updateBranchWithCategories(Request $request, $branchId){
                 Rule::unique('branches')->ignore($branchId)
             ],
             'working_days' => 'required|array',
+            'academies' => 'required|array',
             'categories' => 'required|array',
             'categories.*.categoryId' => 'required|exists:categories,id',
             'categories.*.duration' => 'required|numeric',
@@ -113,14 +125,17 @@ public function updateBranchWithCategories(Request $request, $branchId){
         }
         $branch->categories()->sync($categoryData);
 
+        $branch->academies()->sync($validatedData['academies']);
+
         $branch->workingDays()->delete();
-        foreach ($validatedData['working_days'] as $day) {
+        foreach ($validatedData['working_days'] as $schedule) {
             $workingDay = WorkingDay::create([
                 'branch_id' => $branch->id,
-                'day' => $day
+                'day' => $schedule['day'],
+                'start_time' => $schedule['start_time'],
+                'end_time' => $schedule['end_time']
             ]);
         }
-
         return response()->json(['message' => 'Branch updated and categories synchronized successfully']);
     }
     else{
@@ -141,6 +156,7 @@ public function deleteBranch(Request $request){
             $branch->coaches()->detach();
             $branch->employees()->detach();
             $branch->categories()->detach();
+            $branch->academies()->detach();
             $branch->workingDays()->delete();
 
             // Delete the Branch model

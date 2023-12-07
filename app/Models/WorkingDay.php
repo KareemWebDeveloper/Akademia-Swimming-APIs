@@ -14,6 +14,8 @@ class WorkingDay extends Model
         "employee_id",
         "day",
         "time",
+        "start_time",
+        "end_time",
     ];
 
 }

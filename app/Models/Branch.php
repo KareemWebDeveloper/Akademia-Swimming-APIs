@@ -15,6 +15,10 @@ class Branch extends Model
     {
         return $this->belongsToMany(Coach::class, 'coach_branch');
     }
+    public function academies()
+    {
+        return $this->belongsToMany(Academy::class, 'academy_branch');
+    }
     public function workingDays()
     {
         return $this->hasMany(WorkingDay::class);

@@ -50,7 +50,7 @@ Route::group(['middleware' => ['auth:sanctum']],function(){
     Route::post("/createBranch" ,  [BranchesController::class, 'createBranchWithCategories']);
     Route::put("/updateBranch/{id}" ,  [BranchesController::class, 'updateBranchWithCategories']);
     Route::get("/branches" ,  [BranchesController::class, 'getBranches']);
-    Route::get("/branch/{id}" ,  [BranchesController::class, 'getBranchWithCategories']);
+    Route::get("/branch/{id}" ,  [BranchesController::class, 'getBranchDetails']);
     Route::get("/branch/workingDays/{id}" ,  [BranchesController::class, 'getBranchWorkingDays']);
 
     // Coaches APIs
@@ -114,7 +114,9 @@ Route::group(['middleware' => ['auth:sanctum']],function(){
 
     // Academies APIs
     Route::get("/academies" ,  [AcademiesController::class, 'getAcademies']);
+    Route::get("/academiesOfBranch/{branchId}" ,  [AcademiesController::class, 'getAcademiesInBranch']);
     Route::post("/createAcademy" ,  [AcademiesController::class, 'createAcademy']);
+
 
     // Orders APIs
     Route::post("/createBuyingOrder" ,  [OrdersController::class, 'createBuyingOrder']); // updating the amount available of a specific product and add it to the orders table as a 'buy' order type
