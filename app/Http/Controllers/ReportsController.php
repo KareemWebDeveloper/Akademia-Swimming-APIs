@@ -57,7 +57,9 @@ class ReportsController extends Controller
                      ->get(['price', 'branch_id', 'sale', 'subscription_date']);
 
                  // retrieve all the installments where paid is set to true with their subscriptions branch
-                 $installments = Installment::where('paid',true)->whereBetween('updated_at',[$interval['start_date'], $interval['end_date']])->get();
+                 $installments = Installment::where('paid',true)->whereBetween('updated_at',[$interval['start_date'], $interval['end_date']])->with(['subscription' => function ($query) {
+                    $query->select('id', 'branch_id');
+                }])->get();
                  return response()->json(['subscriptions' => $cashSubscriptions , 'installments' => $installments],200);
              }
              else{

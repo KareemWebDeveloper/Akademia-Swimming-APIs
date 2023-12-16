@@ -80,6 +80,8 @@ Route::group(['middleware' => ['auth:sanctum']],function(){
 
     // Customers APIs
     Route::get("/customers" ,  [CustomersController::class, 'getCustomers']);
+    Route::post("/validateCustomer" ,  [CustomersController::class, 'validateCustomer']);
+    Route::get("/customerActiveSubscriptions/{id}" ,  [CustomersController::class, 'getCustomerActiveSubscriptions']);
     Route::get("/customer/private/{id}" ,  [CustomersController::class, 'getCustomerWithPrivateSubscription']);
     Route::get("/customer/{id}" ,  [CustomersController::class, 'getCustomer']);
     Route::post("/customerBulkDelete" ,  [CustomersController::class, 'CustomersBulkDelete']);
@@ -89,6 +91,7 @@ Route::group(['middleware' => ['auth:sanctum']],function(){
     Route::put("/updateInstallment/{id}" ,  [CustomersController::class, 'updateCustomerInstallment']); // edit a specific installment for a customer
     Route::delete("/deleteInstallment/{id}" ,  [CustomersController::class, 'deleteCustomerInstallment']); // delete a specific installment for a customer
     Route::put("/updateCustomer/{id}" ,  [CustomersController::class, 'updateCustomer']);
+    Route::get("/customerPenultimateSubscription/{customerId}" ,  [CustomersController::class, 'getCustomerPenultimateSubscription']);
 
     // Roles APIs
     Route::get("/roles" ,  [RolesController::class, 'getRoles']);

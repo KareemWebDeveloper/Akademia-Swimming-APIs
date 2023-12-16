@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Academy;
 use App\Models\Category;
+use App\Models\Employee;
 use App\Models\Installment;
 use App\Models\Subscription;
 use App\Models\TrainingSchedule;
@@ -15,6 +16,8 @@ class SubscriptionsController extends Controller
     public function createNewSubscription(Request $request){
         $user = $request->user();
         if($user->type == 'admin' || $user->type == 'Employee'){
+            $created_by = $user->name;
+
             $validatedData = $request->validate([
                 'customer_id' => 'required|numeric',
                 'coach_id' => 'required|numeric',
@@ -31,9 +34,11 @@ class SubscriptionsController extends Controller
                 'sale' => 'nullable|numeric',
                 'is_private' => 'nullable|boolean',
                 'price' => 'required|numeric',
+                'invitations' => 'numeric',
             ]);
             $academy = Academy::find($validatedData['academy_id']);
             $validatedData['academy_name'] = $academy->academy_name;
+            $validatedData['created_by'] = $created_by;
             $category = Category::find($validatedData['category_id']);
             $validatedData['category_name'] = $category->category_name;
             $subscription = Subscription::create($validatedData);
@@ -61,7 +66,7 @@ class SubscriptionsController extends Controller
                     Installment::create($installment);
                 }
             }
-            return response()->json(['subscription' => $subscription],200);
+            return response()->json(['subscription' => $subscription , 'customer' => $subscription->customer , 'created_by' => $created_by],200);
         }
         else{
             return response()->json(['message' => 'unauthorized'],401);

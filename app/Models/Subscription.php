@@ -30,6 +30,8 @@ class Subscription extends Model
         'isfrozen',
         'is_private',
         'price',
+        'created_by',
+        'invitations',
     ];
 
     public function customer(){

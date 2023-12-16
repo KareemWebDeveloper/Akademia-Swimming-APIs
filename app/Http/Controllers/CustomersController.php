@@ -50,6 +50,53 @@ class CustomersController extends Controller
         }
     }
 
+    public function getCustomerActiveSubscriptions(Request $request , $customerId){
+        $user = $request->user();
+        if($user->type == 'admin' || $user->type == 'Employee'){
+            $customer = Customer::find($customerId);
+            $activeSubscriptions = $customer->subscriptions()->where('state', 'active')->with('branch' , 'coach')->get();
+            // $lastSubscriptionSchedule =  $lastSubscription->trainingSchedules;
+            return response()->json(['customer' => $customer , 'activeSubscriptions' => $activeSubscriptions] ,200);
+        }
+        else{
+            return response()->json(['message' => 'unauthorized'],401);
+        }
+    }
+    public function getCustomerPenultimateSubscription(Request $request , $customerId){
+        $user = $request->user();
+        if($user->type == 'admin' || $user->type == 'Employee'){
+            $customer = Customer::find($customerId);
+            $penultimateSubscription = $customer->subscriptions()->with('branch','coach')->latest('id')->skip(1)->first();
+            if ($penultimateSubscription) {
+                return response()->json(['penultimateSubscription' => $penultimateSubscription] ,200);
+            } else {
+                // The customer may have only one subscription or no subscriptions.
+                return response()->json(['penultimateSubscription' => []] ,200);
+            }
+        }
+        else{
+            return response()->json(['message' => 'unauthorized'],401);
+        }
+    }
+    public function validateCustomer(Request $request){
+        $user = $request->user();
+        if($user->type == 'admin' || $user->type == 'Employee'){
+            $validatedData = $request->validate([
+                'customer_name' => 'required|string',
+                'customer_email' => 'required|email|unique:customers,customer_email',
+                'customer_address' => 'required|string',
+                'birthdate' => 'date|nullable',
+                'customer_phone' => 'required|string|unique:customers,customer_phone',
+                'gender' => 'nullable|string',
+                'job' => 'nullable|string',
+            ]);
+            return response()->json(['validation' => true],200);
+        }
+        else{
+            return response()->json(['message' => 'unauthorized'],401);
+        }
+    }
+
     public function createCustomer(Request $request){
         $user = $request->user();
         if($user->type == 'admin' || $user->type == 'Employee'){

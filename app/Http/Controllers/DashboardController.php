@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\Employee;
 use App\Models\Expense;
 use App\Models\Installment;
+use App\Models\Product;
 use App\Models\Salary;
 use App\Models\Subscription;
 use Carbon\Carbon;
@@ -17,6 +18,9 @@ class DashboardController extends Controller
 {
     public function getInsights(Request $request) {
         $customersCount = Customer::count();
+        $productsCount = Product::count();
+        $maleCustomersCount = Customer::where('gender' , 'male')->count();
+        $femaleCustomersCount = Customer::where('gender' , 'female')->count();
         $activeCustomers = Customer::whereHas('subscriptions', function ($query) {
             $query->where('state', 'active');
         })->count();
@@ -29,7 +33,7 @@ class DashboardController extends Controller
         $branchesCount = Branch::count();
         return response()->json(['customersCount'=> $customersCount, 'activeCustomers'=> $activeCustomers, 'activeSubscriptions' => $activeSubscriptions ,
         'frozenSubscriptions' => $frozenSubscriptions , 'unpaidInstallments' => $unpaidInstallments , 'inactiveSubscriptions' => $inactiveSubscriptions ,
-         'coachesCount' => $coachesCount , 'employeesCount' => $employeesCount , 'branchesCount' => $branchesCount ],200);
+         'coachesCount' => $coachesCount , 'femaleCustomersCount' => $femaleCustomersCount , 'maleCustomersCount' => $maleCustomersCount , 'productsCount' => $productsCount , 'employeesCount' => $employeesCount , 'branchesCount' => $branchesCount ],200);
     }
     public function annualProfitsChart(Request $request) {
         // Initialize an array to store the monthly revenues and expenses
