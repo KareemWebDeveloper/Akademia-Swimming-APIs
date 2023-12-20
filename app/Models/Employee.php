@@ -18,6 +18,8 @@ class Employee extends Model
         'phone',
         'salary',
         'last_paid_date',
+        'advance_payment',
+        'salary_discount',
     ];
     public function branches(){
         return $this->belongsToMany(Branch::class, 'employee_branch');

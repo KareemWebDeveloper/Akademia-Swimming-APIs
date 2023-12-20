@@ -12,7 +12,7 @@ class ProductsController extends Controller
     public function getProducts(Request $request) {
         $user = $request->user();
         if($user->type == 'admin' || $user->type == 'Employee'){
-            $products = Product::get();
+            $products = Product::with('ProductSection')->get();
             return response()->json(['products' => $products],200);
         }
         else {
@@ -39,6 +39,7 @@ class ProductsController extends Controller
                 'product_cost' => 'nullable|numeric',
                 'product_count' => 'nullable|numeric',
                 'product_image' => 'nullable|string',
+                'product_section_id' => 'nullable|numeric',
                 'total_price' => 'nullable|numeric',
             ]);
             $product = Product::create($validatedData);
@@ -65,6 +66,7 @@ class ProductsController extends Controller
                 'product_sale' => 'nullable|numeric',
                 'product_cost' => 'nullable|numeric',
                 'product_count' => 'nullable|numeric',
+                'product_section_id' => 'nullable|numeric',
                 'product_image' => 'nullable|string',
             ]);
             $product = Product::find($id);

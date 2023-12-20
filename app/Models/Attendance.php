@@ -10,6 +10,7 @@ class Attendance extends Model
     use HasFactory;
     protected $fillable = [
         'customer_id',
+        'subscription_id',
         'coach_id',
         'branch_id',
         'category_id',
@@ -24,6 +25,9 @@ class Attendance extends Model
     }
     public function branch(){
         return $this->belongsTo(Branch::class);
+    }
+    public function subscription(){
+        return $this->belongsTo(Subscription::class);
     }
     public function category(){
         return $this->belongsTo(Category::class);

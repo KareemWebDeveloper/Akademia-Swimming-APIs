@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Coach;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -14,6 +15,17 @@ class EmployeesController extends Controller
         if($user->type == 'admin' || $user->type == 'Employee'){
             $employees = Employee::get();
             return response()->json(['employees' => $employees],200);
+        }
+        else{
+            return response()->json(['message' => 'unauthorized'],401);
+        }
+    }
+    public function getAllWorkers(Request $request){
+        $user = $request->user();
+        if($user->type == 'admin' || $user->type == 'Employee'){
+            $employees = Employee::get();
+            $coaches = Coach::get();
+            return response()->json(['employees' => $employees , 'coaches' => $coaches],200);
         }
         else{
             return response()->json(['message' => 'unauthorized'],401);
@@ -87,6 +99,8 @@ class EmployeesController extends Controller
                 ],
                 'type' => 'nullable',
                 'salary' => 'required|numeric',
+                'advance_payment' => 'nullable|numeric',
+                'salary_discount' => 'nullable|numeric',
             ]);
             $validatedData['password'] = bcrypt($validatedData['password']);
             $employee = Employee::find($employeeId);
@@ -102,6 +116,21 @@ class EmployeesController extends Controller
             }
         return response()->json(['employee' => $employee],200);
 
+        }
+        else{
+            return response()->json(['message' => 'unauthorized'],401);
+        }
+    }
+    public function updateEmployeeFinances(Request $request , $employeeId){
+        $user = $request->user();
+        if($user->type == 'admin' || $user->type == 'Employee'){
+            $validatedData = $request->validate([
+                'advance_payment' => 'nullable',
+                'salary_discount' => 'nullable',
+            ]);
+            $employee = Employee::find($employeeId);
+            $employee->update($validatedData);
+            return response()->json(['employee' => $employee],200);
         }
         else{
             return response()->json(['message' => 'unauthorized'],401);

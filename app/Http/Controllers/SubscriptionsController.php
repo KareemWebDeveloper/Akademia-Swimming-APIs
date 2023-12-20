@@ -84,6 +84,16 @@ class SubscriptionsController extends Controller
             return response()->json(['message' => 'unauthorized'],401);
         }
     }
+    public function unpaidInstallments(Request $request){
+        $user = $request->user();
+        if($user->type == 'admin' || $user->type == 'Employee'){
+            $installments = Installment::where('paid' , false)->with('customer')->get();
+            return response()->json(['installments' => $installments],200);
+        }
+        else{
+            return response()->json(['message' => 'unauthorized'],401);
+        }
+    }
 
     public function checkSubscriptionStatuses(){
         $currentDate = Carbon::now()->format('Y-m-d');

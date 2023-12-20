@@ -46,6 +46,9 @@ class Subscription extends Model
     public function academy(){
         return $this->belongsTo(Academy::class);
     }
+    public function attendances(){
+        return $this->hasMany(Attendance::class);
+    }
     public function category(){
         return $this->belongsTo(Category::class);
     }

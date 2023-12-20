@@ -22,12 +22,24 @@ class SalariesController extends Controller
             return response()->json(['message' => 'unauthorized'],401);
         }
     }
+    public function getCoachSalaries(Request $request , $coachId){
+        $user = $request->user();
+        if($user->type == 'admin' || $user->type == 'Employee'){
+            $coach = Coach::find($coachId);
+            $salaries = $coach->salaries;
+            return response()->json(['salaries' => $salaries],200);
+        }
+        else {
+            return response()->json(['message' => 'unauthorized'],401);
+        }
+    }
     public function getCoachAttendances(Request $request , $coachId){
         $user = $request->user();
         if($user->type == 'admin' || $user->type == 'Employee'){
             $coach = Coach::find($coachId);
             if($coach->last_paid_date){
-                $attendances = Attendance::with('branch')->where('coach_id', $coachId)->where('created_at', '>=', date('Y-m-d H:i:s', strtotime($coach->last_paid_date)))->get();
+                $latestSalary = $coach->salaries()->latest()->first();
+                $attendances = Attendance::with('branch')->where('coach_id', $coachId)->where('created_at', '>', date('Y-m-d H:i:s', strtotime($latestSalary->created_at)))->get();
                 return response()->json(['attendances' => $attendances],200);
             }
             else{
@@ -44,9 +56,16 @@ class SalariesController extends Controller
         if($user->type == 'admin' || $user->type == 'Employee'){
             $currentDate = Carbon::now()->format('Y-m-d');
             $employee = Employee::find($employeeId);
+            $employeeSalary = 0;
+            if($employee->salary_discount && $employee->salary_discount > 0){
+                $employeeSalary = $employee->salary - $employee->salary_discount;
+            }
+            else{
+                $employeeSalary = $employee->salary;
+            }
             $salary = Salary::create([
                 'employee_id' => $employee->id,
-                'amount' => $employee->salary,
+                'amount' => $employeeSalary,
                 'paid_date' => $currentDate
             ]);
             $employee->update(['last_paid_date' => $currentDate]);

@@ -55,6 +55,21 @@ class CoachesController extends Controller
             return response()->json(['message' => 'unauthorized'],401);
         }
     }
+    public function updateCoachFinances(Request $request , $coachId){
+        $user = $request->user();
+        if($user->type == 'admin' || $user->type == 'Employee'){
+            $validatedData = $request->validate([
+                'advance_payment' => 'nullable',
+                'salary_discount' => 'nullable',
+            ]);
+            $coach = Coach::find($coachId);
+            $coach->update($validatedData);
+            return response()->json(['coach' => $coach],200);
+        }
+        else{
+            return response()->json(['message' => 'unauthorized'],401);
+        }
+    }
     public function createCoach(Request $request){
         $user = $request->user();
         if($user->type == 'admin' || $user->type == 'Employee'){

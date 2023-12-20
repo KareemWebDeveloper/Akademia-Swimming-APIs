@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\Installment;
+use App\Models\Subscription;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -126,6 +127,17 @@ class CustomersController extends Controller
             ]);
             $installment->update($validatedData);
             return response()->json(['installment' => $installment],200);
+        }
+        else{
+            return response()->json(['message' => 'unauthorized'],401);
+        }
+    }
+    public function customerSubscriptionAttendances(Request $request , $subscriptionId){
+        $user = $request->user();
+        if($user->type == 'admin' || $user->type == 'Employee'){
+            $subscription = Subscription::find($subscriptionId);
+            $attendances = $subscription->attendances;
+            return response()->json(['attendances' => $attendances],200);
         }
         else{
             return response()->json(['message' => 'unauthorized'],401);

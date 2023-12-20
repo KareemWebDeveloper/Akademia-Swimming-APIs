@@ -19,6 +19,8 @@ class Coach extends Model
         'salary_per_hour',
         'hours_worked',
         'last_paid_date',
+        'advance_payment',
+        'salary_discount',
     ];
     public function branches(){
         return $this->belongsToMany(Branch::class, 'coach_branch');

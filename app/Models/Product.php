@@ -15,5 +15,9 @@ class Product extends Model
         'product_cost',
         'product_count',
         'product_image',
+        'product_section_id',
     ];
+    public function ProductSection(){
+        return $this->belongsTo(ProductSections::class);
+    }
 }

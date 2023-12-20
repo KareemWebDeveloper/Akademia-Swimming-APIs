@@ -91,6 +91,7 @@ Route::group(['middleware' => ['auth:sanctum']],function(){
     Route::put("/updateInstallment/{id}" ,  [CustomersController::class, 'updateCustomerInstallment']); // edit a specific installment for a customer
     Route::delete("/deleteInstallment/{id}" ,  [CustomersController::class, 'deleteCustomerInstallment']); // delete a specific installment for a customer
     Route::put("/updateCustomer/{id}" ,  [CustomersController::class, 'updateCustomer']);
+    Route::get("/customerAttendances/{subscriptionId}" ,  [CustomersController::class, 'customerSubscriptionAttendances']);
     Route::get("/customerPenultimateSubscription/{customerId}" ,  [CustomersController::class, 'getCustomerPenultimateSubscription']);
 
     // Roles APIs
@@ -107,6 +108,7 @@ Route::group(['middleware' => ['auth:sanctum']],function(){
     Route::get("/privateSubscriptions" ,  [SubscriptionsController::class, 'getPrivateSubscriptions']); // cancelling a customer subscription freeze
     Route::post("/checkSubscriptionStatuses" ,  [SubscriptionsController::class, 'checkSubscriptionStatuses']); // used to check the subscriptions end date and ensures that if a subscription is expired update the status into "inactive"
     Route::post("/checkFreezeStatuses" ,  [SubscriptionsController::class, 'checkFreezeStatuses']); // used to check the subscriptions freeze end date and ensures that if the freeze is expired update the status into "active"
+    Route::get("/unpaidInstallments" ,  [SubscriptionsController::class, 'unpaidInstallments']); // used to check the subscriptions freeze end date and ensures that if the freeze is expired update the status into "active"
 
     // Products APIs
     Route::get("/products" ,  [ProductsController::class, 'getProducts']);
@@ -114,6 +116,12 @@ Route::group(['middleware' => ['auth:sanctum']],function(){
     Route::post("/createProduct" ,  [ProductsController::class, 'createProduct']);
     Route::post("/productsBulkDelete" ,  [ProductsController::class, 'ProductsBulkDelete']);
     Route::put("/updateProduct/{id}" ,  [ProductsController::class, 'updateProduct']);
+
+    // Product Sections
+    Route::post("/createProductSection" ,  [CategoriesController::class, 'createProductSection']);
+    Route::get("/productSections" ,  [CategoriesController::class, 'getProductSections']);
+    Route::put("/updateProductSection/{id}" ,  [CategoriesController::class, 'updateProductSection']);
+    Route::post("/productSectionBulkDelete" ,  [CategoriesController::class, 'productSectionBulkDelete']);
 
     // Academies APIs
     Route::get("/academies" ,  [AcademiesController::class, 'getAcademies']);
@@ -124,6 +132,7 @@ Route::group(['middleware' => ['auth:sanctum']],function(){
     // Orders APIs
     Route::post("/createBuyingOrder" ,  [OrdersController::class, 'createBuyingOrder']); // updating the amount available of a specific product and add it to the orders table as a 'buy' order type
     Route::post("/createSellingOrder" ,  [OrdersController::class, 'createSellingOrder']); // create a selling order then update then update the product amount
+    Route::delete("/deleteOrder/{id}" ,  [OrdersController::class, 'deleteOrder']); // delete order (refund)
 
     // Levels APIs
     Route::get("/levels" ,  [LevelsController::class, 'getLevels']);
@@ -136,7 +145,9 @@ Route::group(['middleware' => ['auth:sanctum']],function(){
     // Attendance APIs
     Route::get("/coaches/active/{branch_id}" ,  [AttendanceController::class, 'getActiveCoachesByBranch']);
     Route::get("/customers/active/{branch_id}" ,  [AttendanceController::class, 'getActiveCustomersByBranch']);
+    Route::post("attendances" ,  [AttendanceController::class, 'getAttendances']);
     Route::post("/bulkAttendance" ,  [AttendanceController::class, 'bulkAttendance']);
+    Route::delete("/attendanceDelete/{id}" ,  [AttendanceController::class, 'deleteAttendance']);
 
     // Reports APIs
     Route::get("/revenues/{branchId}" ,  [ReportsController::class, 'getRevenues']);
@@ -153,12 +164,18 @@ Route::group(['middleware' => ['auth:sanctum']],function(){
 
     // Salaries APIs
     Route::get("/expectedSalaries" ,  [SalariesController::class, 'getCoachesAndEmployees']);
+    // Route::get("/CoachSalaries/{id}" ,  [SalariesController::class, 'getCoachSalaries']);
     Route::post("/payEmployeeSalary/{employeeId}" ,  [SalariesController::class, 'payEmployeeSalary']);
     Route::post("/payCoachSalary/{coachId}" ,  [SalariesController::class, 'payCoachSalary']);
     Route::get("/coach/attendances/{coachId}" ,  [SalariesController::class, 'getCoachAttendances']);
     // Generate Dashboard Charts
     Route::get("/annualProfitsChart" ,  [DashboardController::class, 'annualProfitsChart']);
     Route::get("/insights" ,  [DashboardController::class, 'getInsights']);
+
+    // discounts and advance payments
+    Route::get("/allWorkers" ,  [EmployeesController::class, 'getAllWorkers']);
+    Route::put("/updateEmployeeFinances/{id}" ,  [EmployeesController::class, 'updateEmployeeFinances']);
+    Route::put("/updateCoachFinances/{id}" ,  [CoachesController::class, 'updateCoachFinances']);
 
 });
 

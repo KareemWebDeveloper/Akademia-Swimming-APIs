@@ -30,6 +30,32 @@ class OrdersController extends Controller
             return response()->json(['message' => 'unauthorized'],401);
         }
     }
+    public function deleteOrder(Request $request , $orderId) {
+        $user = $request->user();
+        if($user->type == 'admin' || $user->type == 'Employee'){
+            $order = Order::find($orderId);
+            $product = $order->product;
+            if($order->order_type == 'buy'){
+                $productCount = $product->product_count;
+                $orderQuantity = $order->count;
+                $product->update([
+                    'product_count' => $productCount == 0 || $orderQuantity > $productCount ? 0 : $productCount - $orderQuantity
+                ]);
+            }
+            else{
+                $productCount = $product->product_count;
+                $orderQuantity = $order->count;
+                $product->update([
+                    'product_count' => $productCount + $orderQuantity
+                ]);
+            }
+            $order->delete();
+            return response()->json(['message' => 'deleted successfully'],200);
+        }
+        else{
+            return response()->json(['message' => 'unauthorized'],401);
+        }
+    }
     public function createSellingOrder(Request $request){
         $user = $request->user();
         if($user->type == 'admin' || $user->type == 'Employee'){

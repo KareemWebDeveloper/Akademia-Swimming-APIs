@@ -43,6 +43,49 @@ class AttendanceController extends Controller
             return response()->json(['message' => 'unauthorized'],401);
         }
     }
+    public function getAttendances(Request $request){
+        $user = $request->user();
+        if($user->type == 'admin' || $user->type == 'Employee'){
+            $validatedData = $request->validate([
+                'target_date' => 'date',
+            ]);
+            $CoachesAttendances = Attendance::whereNotNull('coach_id')->whereDate('created_at', $validatedData['target_date'])->
+            with('coach' , 'category')->get();
+            $CustomersAttendances = Attendance::whereNotNull('customer_id')->whereDate('created_at', $validatedData['target_date'])->
+            with('customer' , 'branch' , 'subscription.coach')->get();
+            return response()->json(['coaches' => $CoachesAttendances , 'customers' => $CustomersAttendances],200);
+        }
+        else{
+            return response()->json(['message' => 'unauthorized'],401);
+        }
+    }
+    public function deleteAttendance (Request $request , $id){
+        $user = $request->user();
+        if($user->type == 'admin' || $user->type == 'Employee'){
+            $attendance = Attendance::find($id);
+            if($attendance->subscription_id){
+                $subscription = Subscription::find($attendance->subscription_id);
+                $number_of_sessions = $subscription->number_of_sessions;
+                $newSessionsNumber = $number_of_sessions + 1;
+                $subscription->update([
+                    'number_of_sessions' => $newSessionsNumber
+                ]);
+            }
+            if($attendance->coach_id){
+                $coach = Coach::find($attendance->coach_id);
+                $coachWorkedHours = $coach->hours_worked;
+                $session_duration = $attendance->session_duration;
+                $coach->update([
+                    'hours_worked' => $coachWorkedHours - $session_duration
+                ]);
+            }
+            $attendance->delete();
+            return response()->json(['message' => 'deleted successfully'],200);
+        }
+        else{
+            return response()->json(['message' => 'unauthorized'],401);
+        }
+    }
     public function bulkAttendance(Request $request){
         $user = $request->user();
         if($user->type == 'admin' || $user->type == 'Employee'){
@@ -63,6 +106,7 @@ class AttendanceController extends Controller
                         'training_start_time' => $validatedData['training_start_time'],
                         'session_duration' => $validatedData['session_duration'],
                         'customer_id' => $customer['customer_id'],
+                        'subscription_id' => $customer['subscription_id'],
                     ]);
                     $currentCustomer = Customer::find($customer['customer_id']);
                     $currentCustomer->last_attendance_date = $currentDateTime;
