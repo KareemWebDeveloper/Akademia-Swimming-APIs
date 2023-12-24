@@ -63,7 +63,7 @@ class DashboardController extends Controller
             $endDate = Carbon::createFromDate($currentYear, $month, 1)->endOfMonth();
 
             // Retrieve the revenues for the month
-            $cashSubscriptions = Subscription::where('subscription_type', 'cash')->whereBetween('subscription_date', [$startDate, $endDate])->get(['price','sale',]);
+            $cashSubscriptions = Subscription::where('subscription_type', '!=', 'installments')->whereBetween('subscription_date', [$startDate, $endDate])->get(['price','sale',]);
             $installments = Installment::where('paid', true)->whereBetween('updated_at', [$startDate, $endDate])->get();
 
             // Calculate the sum of cash subscription prices

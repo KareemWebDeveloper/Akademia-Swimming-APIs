@@ -12,8 +12,8 @@ class ReportsController extends Controller
         $user = $request->user();
         if($user->type == 'admin' || $user->type == 'Employee'){
              if($branchId == 0){
-                 // retrieve all subscriptions where subscription_type is cash
-                 $cashSubscriptions = Subscription::where('subscription_type', 'cash')->with('branch')->get(
+                 // retrieve all subscriptions where subscription_type is not installments
+                 $cashSubscriptions = Subscription::where('subscription_type', '!=', 'installments')->with('branch')->get(
                  ['price', 'branch_id', 'category_name' , 'sale' , 'subscription_date' , 'expiration_date' , 'academy_name']);
 
                  // retrieve all the installments where paid is set to true with their subscriptions branch
@@ -23,8 +23,8 @@ class ReportsController extends Controller
                  return response()->json(['subscriptions' => $cashSubscriptions , 'installments' => $installments],200);
              }
              else{
-                 // retrieve a branch subscriptions where subscription_type is cash
-                 $cashSubscriptions = Subscription::where('subscription_type', 'cash')->where('branch_id', $branchId)->with('branch')->get(
+                 // retrieve a branch subscriptions where subscription_type is not installments
+                 $cashSubscriptions = Subscription::where('subscription_type', '!=', 'installments')->where('branch_id', $branchId)->with('branch')->get(
                  ['price', 'branch_id', 'category_name' , 'sale' , 'subscription_date' , 'expiration_date' , 'academy_name']);
 
                  // retrieve a branch installments where paid is set to true with their subscriptions branch
@@ -52,7 +52,7 @@ class ReportsController extends Controller
             ]);
              if($branchId == 0){
                  // retrieve all subscriptions where subscription_type is cash in a time interval
-                 $cashSubscriptions = Subscription::where('subscription_type', 'cash')
+                 $cashSubscriptions = Subscription::where('subscription_type', '!=', 'installments')
                      ->whereBetween('subscription_date', [$interval['start_date'], $interval['end_date']])
                      ->get(['price', 'branch_id', 'sale', 'subscription_date']);
 
@@ -64,7 +64,7 @@ class ReportsController extends Controller
              }
              else{
                  // retrieve a branch subscriptions where subscription_type is cash in a time interval
-                 $cashSubscriptions = Subscription::where('subscription_type', 'cash')->where('branch_id', $branchId)->whereBetween('subscription_date', [$interval['start_date'], $interval['end_date']])->get(
+                 $cashSubscriptions = Subscription::where('subscription_type', '!=', 'installments')->where('branch_id', $branchId)->whereBetween('subscription_date', [$interval['start_date'], $interval['end_date']])->get(
                  ['price', 'branch_id', 'sale' , 'subscription_date']);
 
                  // retrieve a branch installments where paid is set to true with their subscriptions branch in a specific time interval
