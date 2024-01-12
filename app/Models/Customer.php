@@ -27,6 +27,9 @@ class Customer extends Model
     public function subscriptions(){
         return $this->hasMany(Subscription::class);
     }
+    public function orders(){
+        return $this->hasMany(Order::class);
+    }
     public function activeSubscriptions()
     {
         return $this->hasMany(Subscription::class)->whereIn('state', ['active', 'frozen']);
