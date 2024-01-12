@@ -240,6 +240,7 @@ class CustomersController extends Controller
                 }
                 // Delete the customer model
                 $customer->installments()->delete();
+                $customer->attendances()->delete();
                 $customerSubscriptions = $customer->subscriptions;
                 foreach($customerSubscriptions as $subscription){
                     $subscription->customer()->dissociate();
