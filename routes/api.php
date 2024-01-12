@@ -80,6 +80,7 @@ Route::group(['middleware' => ['auth:sanctum']],function(){
 
     // Customers APIs
     Route::get("/customers" ,  [CustomersController::class, 'getCustomers']);
+    Route::get("/customersReservedOnly" ,  [CustomersController::class, 'getReservedOnlyCustomers']);
     Route::post("/validateCustomer" ,  [CustomersController::class, 'validateCustomer']);
     Route::get("/customerActiveSubscriptions/{id}" ,  [CustomersController::class, 'getCustomerActiveSubscriptions']);
     Route::get("/customer/private/{id}" ,  [CustomersController::class, 'getCustomerWithPrivateSubscription']);

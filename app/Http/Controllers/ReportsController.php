@@ -14,7 +14,7 @@ class ReportsController extends Controller
              if($branchId == 0){
                  // retrieve all subscriptions where subscription_type is not installments
                  $cashSubscriptions = Subscription::where('subscription_type', '!=', 'installments')->with('branch')->get(
-                 ['price', 'branch_id', 'subscription_type' , 'category_name' , 'sale' , 'subscription_date' , 'expiration_date' , 'academy_name']);
+                 ['price', 'branch_id', 'subscription_type' , 'created_at' , 'category_name' , 'sale' , 'subscription_date' , 'expiration_date' , 'academy_name']);
 
                  // retrieve all the installments where paid is set to true with their subscriptions branch
                  $installments = Installment::where('paid',true)->with(['subscription' => function ($query) {
@@ -25,7 +25,7 @@ class ReportsController extends Controller
              else{
                  // retrieve a branch subscriptions where subscription_type is not installments
                  $cashSubscriptions = Subscription::where('subscription_type', '!=', 'installments')->where('branch_id', $branchId)->with('branch')->get(
-                 ['price', 'branch_id', 'category_name' , 'subscription_type' , 'sale' , 'subscription_date' , 'expiration_date' , 'academy_name']);
+                 ['price', 'branch_id', 'category_name' , 'created_at' , 'subscription_type' , 'sale' , 'subscription_date' , 'expiration_date' , 'academy_name']);
 
                  // retrieve a branch installments where paid is set to true with their subscriptions branch
                  $installments = Installment::where('paid', true)

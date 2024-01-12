@@ -50,6 +50,16 @@ class CustomersController extends Controller
             return response()->json(['message' => 'unauthorized'],401);
         }
     }
+    public function getReservedOnlyCustomers(Request $request){
+        $user = $request->user();
+        if($user->type == 'admin' || $user->type == 'Employee'){
+            $customersWithoutSubscriptions = Customer::doesntHave('subscriptions')->get();
+            return response()->json(['customers' => $customersWithoutSubscriptions],200);
+        }
+        else{
+            return response()->json(['message' => 'unauthorized'],401);
+        }
+    }
 
     public function getCustomerActiveSubscriptions(Request $request , $customerId){
         $user = $request->user();
