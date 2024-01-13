@@ -93,7 +93,7 @@ class EmployeesController extends Controller
                     Rule::unique('employees', 'email')->ignore($employeeId)
                 ],
                 'address' => 'required|string',
-                'password' => 'required|string',
+                'password' => 'string',
                 'phone' => [
                     Rule::unique('employees' , 'phone')->ignore($employeeId)
                 ],
