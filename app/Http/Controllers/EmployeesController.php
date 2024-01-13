@@ -93,7 +93,7 @@ class EmployeesController extends Controller
                     Rule::unique('employees', 'email')->ignore($employeeId)
                 ],
                 'address' => 'required|string',
-                'password' => 'string',
+                'password' => 'nullable|string',
                 'phone' => [
                     Rule::unique('employees' , 'phone')->ignore($employeeId)
                 ],
@@ -102,7 +102,9 @@ class EmployeesController extends Controller
                 'advance_payment' => 'nullable|numeric',
                 'salary_discount' => 'nullable|numeric',
             ]);
-            $validatedData['password'] = bcrypt($validatedData['password']);
+            if($validatedData['password']){
+                $validatedData['password'] = bcrypt($validatedData['password']);
+            }
             $employee = Employee::find($employeeId);
             $employee->update($validatedData);
             // Attach the employee to branches
