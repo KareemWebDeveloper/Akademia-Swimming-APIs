@@ -98,7 +98,7 @@ class AttendanceController extends Controller
                 'customers' => 'nullable|array',
                 'is_attended' => 'nullable|boolean',
             ]);
-            $currentDateTime = Carbon::now()->toIso8601String();
+            $currentDateTime = Carbon::now('Africa/Cairo')->format('Y-m-d H:i:s');
             if(isset($validatedData['customers'])){
                 foreach ($request->input('customers') as $customer) {
                     Attendance::create([
