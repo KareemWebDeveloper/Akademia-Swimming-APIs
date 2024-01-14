@@ -93,7 +93,6 @@ class EmployeesController extends Controller
                     Rule::unique('employees', 'email')->ignore($employeeId)
                 ],
                 'address' => 'required|string',
-                'password' => 'nullable|string',
                 'phone' => [
                     Rule::unique('employees' , 'phone')->ignore($employeeId)
                 ],
@@ -102,8 +101,11 @@ class EmployeesController extends Controller
                 'advance_payment' => 'nullable|numeric',
                 'salary_discount' => 'nullable|numeric',
             ]);
-            if($validatedData['password']){
-                $validatedData['password'] = bcrypt($validatedData['password']);
+            if($request->input('password')){
+                $request->validate([
+                    'password' => 'required|string',
+                ]);
+                $validatedData['password'] = bcrypt($request->input('password'));
             }
             $employee = Employee::find($employeeId);
             $employee->update($validatedData);
