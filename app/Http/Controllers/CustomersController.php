@@ -15,7 +15,7 @@ class CustomersController extends Controller
         if($user->type == 'admin' || $user->type == 'Employee'){
             $customers = Customer::with(['subscriptions' => function ($query) {
                 $query->where('is_private', false)->latest('created_at');
-            }])
+            },'subscriptions.branch' , 'subscriptions.coach'])
             ->whereHas('subscriptions', function ($query) {
                 $query->where('is_private', false);
             })
