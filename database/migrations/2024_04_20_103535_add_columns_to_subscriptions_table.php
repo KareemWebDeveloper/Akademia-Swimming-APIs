@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('subscriptions', function (Blueprint $table) {
-            $table->enum('subscription_type',['installments','cash' ,'visa','vodafone','instapay']);
+            $table->boolean('is_semi_private')->default(false);
         });
     }
 

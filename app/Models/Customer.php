@@ -20,6 +20,8 @@ class Customer extends Model
         'birthdate',
         'customer_phone',
         'last_attendance_date',
+        'attached_academy_id',
+        'attached_branch_id',
         'gender',
         'job',
     ];

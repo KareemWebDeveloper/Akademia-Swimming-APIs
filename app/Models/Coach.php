@@ -12,6 +12,7 @@ class Coach extends Model
 
     protected $fillable = [
         'name',
+        'created_by',
         'email',
         'address',
         'password',

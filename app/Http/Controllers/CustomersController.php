@@ -10,12 +10,25 @@ use Illuminate\Validation\Rule;
 
 class CustomersController extends Controller
 {
+    public function customersInputList(Request $request){
+        $user = $request->user();
+        if($user->type == 'admin' || $user->type == 'Employee'){
+            $customers = Customer::with(['subscriptions' => function ($query) {
+                $query->latest('created_at')->select('id', 'customer_id' , 'branch_id' , 'academy_id' , 'created_at');
+            }])->get(['id' , 'customer_name' , 'customer_phone']);
+            return response()->json(['customers' => $customers],200);
+
+        }
+        else{
+            return response()->json(['message' => 'unauthorized'],401);
+        }
+    }
     public function getCustomers(Request $request){
         $user = $request->user();
         if($user->type == 'admin' || $user->type == 'Employee'){
             $customers = Customer::with(['subscriptions' => function ($query) {
                 $query->where('is_private', false)->latest('created_at');
-            },'subscriptions.branch' , 'subscriptions.coach'])
+            },'subscriptions.branch' , 'subscriptions.coach' , 'subscriptions.trainingSchedules'])
             ->whereHas('subscriptions', function ($query) {
                 $query->where('is_private', false);
             })
@@ -108,6 +121,19 @@ class CustomersController extends Controller
         }
     }
 
+    public function unauthorizedCustomerCreate(Request $request){
+        $validatedData = $request->validate([
+            'customer_name' => 'required|string',
+            'customer_email' => 'required|email|unique:customers,customer_email',
+            'customer_address' => 'required|string',
+            'birthdate' => 'date|nullable',
+            'customer_phone' => 'required|string|unique:customers,customer_phone',
+            'gender' => 'nullable|string',
+            'job' => 'nullable|string',
+        ]);
+        $customer = Customer::create($validatedData);
+        return response()->json(['customer' => $customer],200);
+    }
     public function createCustomer(Request $request){
         $user = $request->user();
         if($user->type == 'admin' || $user->type == 'Employee'){

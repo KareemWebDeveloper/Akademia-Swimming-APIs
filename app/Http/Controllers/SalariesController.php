@@ -86,7 +86,13 @@ class SalariesController extends Controller
             ]);
             $currentDate = Carbon::now()->format('Y-m-d');
             $coach = Coach::find($coachId);
-
+            $coachLastPaidDate = null;
+            if($coach->last_paid_date){
+                $coachLastPaidDate = $coach->last_paid_date;
+            }
+            else{
+                $coachLastPaidDate = $coach->created_at;
+            }
             $salary = Salary::create([
                 'coach_id' => $coachId,
                 'amount' =>  $fields['amount'],
@@ -95,6 +101,7 @@ class SalariesController extends Controller
                 'bonus'=> isset($fields['bonus']) ? $fields['bonus'] : 0,
                 'discount' => isset($fields['discount']) ? $fields['discount'] : 0,
                 'notes' => isset($fields['notes']) ? $fields['notes'] : null,
+                'date_from' => $coachLastPaidDate,
             ]);
             $coach->update([
                 'last_paid_date' => $currentDate,

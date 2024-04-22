@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('subscriptions', function (Blueprint $table) {
-            $table->enum('subscription_type',['installments','cash' ,'visa','vodafone','instapay']);
+        Schema::table('customers', function (Blueprint $table) {
+            $table->unsignedBigInteger('attached_academy_id')->nullable();
+            $table->unsignedBigInteger('attached_branch_id')->nullable();
         });
     }
 
@@ -21,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('subscriptions', function (Blueprint $table) {
+        Schema::table('customers', function (Blueprint $table) {
             //
         });
     }

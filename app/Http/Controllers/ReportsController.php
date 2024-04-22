@@ -13,27 +13,27 @@ class ReportsController extends Controller
         if($user->type == 'admin' || $user->type == 'Employee'){
              if($branchId == 0){
                  // retrieve all subscriptions where subscription_type is not installments
-                 $cashSubscriptions = Subscription::where('subscription_type', '!=', 'installments')->with('branch')->get(
-                 ['price', 'branch_id', 'subscription_type' , 'created_at' , 'category_name' , 'sale' , 'subscription_date' , 'expiration_date' , 'academy_name']);
+                 $cashSubscriptions = Subscription::where('subscription_type', '!=', 'installments')->with('branch' , 'customer')->get(
+                 ['price', 'customer_id' , 'branch_id', 'created_by' , 'subscription_type' , 'created_at' , 'category_name' , 'sale' , 'subscription_date' , 'expiration_date' , 'academy_name']);
 
                  // retrieve all the installments where paid is set to true with their subscriptions branch
                  $installments = Installment::where('paid',true)->with(['subscription' => function ($query) {
-                     $query->select('id', 'branch_id', 'category_name' , 'academy_name' , 'sale' , 'subscription_date' , 'expiration_date');
-                 }, 'subscription.branch'])->get();
+                     $query->select('id', 'customer_id' , 'branch_id', 'created_by' , 'category_name' , 'academy_name' , 'sale' , 'subscription_date' , 'expiration_date');
+                 }, 'subscription.branch' , 'subscription.customer'])->get();
                  return response()->json(['subscriptions' => $cashSubscriptions , 'installments' => $installments],200);
              }
              else{
                  // retrieve a branch subscriptions where subscription_type is not installments
-                 $cashSubscriptions = Subscription::where('subscription_type', '!=', 'installments')->where('branch_id', $branchId)->with('branch')->get(
-                 ['price', 'branch_id', 'category_name' , 'created_at' , 'subscription_type' , 'sale' , 'subscription_date' , 'expiration_date' , 'academy_name']);
+                 $cashSubscriptions = Subscription::where('subscription_type', '!=', 'installments')->where('branch_id', $branchId)->with('branch' , 'customer')->get(
+                 ['price', 'created_by' , 'branch_id' , 'customer_id' , 'category_name' , 'created_at' , 'subscription_type' , 'sale' , 'subscription_date' , 'expiration_date' , 'academy_name']);
 
                  // retrieve a branch installments where paid is set to true with their subscriptions branch
                  $installments = Installment::where('paid', true)
                  ->whereHas('subscription', function ($query) use ($branchId) {
                      $query->where('branch_id', $branchId);
                  })->with(['subscription' => function ($query) {
-                    $query->select('id', 'branch_id', 'category_name', 'academy_name', 'sale', 'subscription_date', 'expiration_date');
-                 }, 'subscription.branch'])
+                    $query->select('id', 'branch_id' , 'customer_id' , 'created_by' , 'category_name', 'academy_name', 'sale', 'subscription_date', 'expiration_date');
+                 }, 'subscription.branch' , 'subscription.customer'])
                  ->get();
                  return response()->json(['subscriptions' => $cashSubscriptions , 'installments' => $installments],200);
              }

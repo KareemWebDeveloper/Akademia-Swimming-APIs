@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Academy;
 use App\Models\Category;
+use App\Models\Customer;
 use App\Models\Employee;
 use App\Models\Installment;
 use App\Models\Subscription;
@@ -33,15 +34,30 @@ class SubscriptionsController extends Controller
                 'subscription_type' => 'required|string',
                 'sale' => 'nullable|numeric',
                 'is_private' => 'nullable|boolean',
+                'is_semi_private' => 'nullable|boolean',
                 'price' => 'required|numeric',
                 'invitations' => 'numeric',
             ]);
+            $currentDate = Carbon::today()->format('Y-m-d');
+            $subscription_date = date('Y-m-d', strtotime($validatedData['subscription_date']));
+            if ($currentDate < $subscription_date) {
+                // Today's date is less than the subscription_date (upcoming subscription)
+                $validatedData['state'] = 'inactive';
+            }
+            else{
+                $validatedData['state'] = 'active';
+            }
             $academy = Academy::find($validatedData['academy_id']);
             $validatedData['academy_name'] = $academy->academy_name;
             $validatedData['created_by'] = $created_by;
             $category = Category::find($validatedData['category_id']);
             $validatedData['category_name'] = $category->category_name;
             $subscription = Subscription::create($validatedData);
+            $customer = Customer::findOrFail($validatedData['customer_id']);
+            $customer->update([
+                'attached_academy_id' => $subscription->academy_id,
+                'attached_branch_id' => $subscription->branch_id
+            ]);
 
             $trainingSchedule = $request->validate([
                 'training_schedules' => 'required|array',
@@ -99,15 +115,27 @@ class SubscriptionsController extends Controller
         $currentDate = Carbon::now()->format('Y-m-d');
 
         // Get the active customers with subscription end dates smaller than or equal to today
-        $subscriptions = Subscription::where('state', 'active')
+        $inactiveSubscriptions = Subscription::where('state', 'active')
         ->where('expiration_date', '<', $currentDate)->get();
 
         // Update the status of the selected customers to 'inactive'
-        foreach ($subscriptions as $subscription) {
+        foreach ($inactiveSubscriptions as $subscription) {
             $subscription->update([
-                    'state' =>  'inactive'
+                'state' =>  'inactive',
+                'number_of_sessions' =>  0
             ]);
         }
+
+        $activeSubscriptions = Subscription::where('state', 'inactive')
+        ->where('subscription_date', '<=', $currentDate)->where('expiration_date', '>', $currentDate)->get();
+
+        // Update the status of the selected customers to 'active'
+        foreach ($activeSubscriptions as $subscription) {
+            $subscription->update([
+                'state' =>  'active'
+            ]);
+        }
+
         return response()->json(['message' => 'subscriptions statuses updated successfully'],200);
     }
 
@@ -215,12 +243,27 @@ class SubscriptionsController extends Controller
                 'sale' => 'nullable|numeric',
                 'is_private' => 'nullable|boolean',
                 'price' => 'required|numeric',
+                'invitations' => 'nullable|numeric',
                 'training_schedules' => 'required|array',
             ]);
+            $currentDate = Carbon::today()->format('Y-m-d');
+            $subscription_date = date('Y-m-d', strtotime($validatedData['subscription_date']));
+            if ($currentDate < $subscription_date) {
+                // Today's date is less than the subscription_date (upcoming subscription)
+                $validatedData['state'] = 'inactive';
+            }
+            else{
+                $validatedData['state'] = 'active';
+            }
             $academy = Academy::find($validatedData['academy_id']);
             $validatedData['academy_name'] = $academy->academy_name;
             $Subscription = Subscription::find($id);
             $Subscription->update($validatedData);
+            $customer = Customer::findOrFail($validatedData['customer_id']);
+            $customer->update([
+                'attached_academy_id' => $Subscription->academy_id,
+                'attached_branch_id' => $Subscription->branch_id
+            ]);
             $Subscription->trainingSchedules()->each(function($trainingSchedule) {
                 $trainingSchedule->delete();
             });

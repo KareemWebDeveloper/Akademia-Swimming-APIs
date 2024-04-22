@@ -29,6 +29,7 @@ class Subscription extends Model
         'state',
         'isfrozen',
         'is_private',
+        'is_semi_private',
         'price',
         'created_by',
         'invitations',

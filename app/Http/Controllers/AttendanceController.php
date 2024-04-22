@@ -89,6 +89,7 @@ class AttendanceController extends Controller
     public function bulkAttendance(Request $request){
         $user = $request->user();
         if($user->type == 'admin' || $user->type == 'Employee'){
+            $created_by = $user->name;
             $validatedData = $request->validate([
                 'coach_ids' => 'nullable|array',
                 'category_id' => 'nullable|numeric',
@@ -107,6 +108,7 @@ class AttendanceController extends Controller
                         'session_duration' => $validatedData['session_duration'],
                         'customer_id' => $customer['customer_id'],
                         'subscription_id' => $customer['subscription_id'],
+                        'created_by' => $created_by,
                     ]);
                     $currentCustomer = Customer::find($customer['customer_id']);
                     $currentCustomer->last_attendance_date = $currentDateTime;
@@ -127,6 +129,7 @@ class AttendanceController extends Controller
                         'training_start_time' => $validatedData['training_start_time'],
                         'session_duration' => $validatedData['session_duration'],
                         'coach_id' => $id,
+                        'created_by' => $created_by,
                         'is_attended' => isset($validatedData['is_attended']) ? $validatedData['is_attended'] : true,
                     ]);
                     $coach = Coach::find($id);

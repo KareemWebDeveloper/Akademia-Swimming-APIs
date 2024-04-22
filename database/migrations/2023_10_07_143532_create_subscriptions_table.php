@@ -25,7 +25,7 @@ return new class extends Migration
             $table->integer('number_of_sessions');
             $table->integer('sessions_per_week');
             $table->float('sale')->nullable();
-            $table->enum('state',['active','inactive'])->default('active');
+            $table->enum('state',['active','inactive','frozen'])->default('active');
             $table->boolean('isfrozen')->default(false);
 
             $table->foreign('customer_id')->references('id')->on('customers');

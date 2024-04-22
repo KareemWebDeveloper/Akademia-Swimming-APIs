@@ -36,7 +36,8 @@ Route::post("/adminLogin" ,  [AuthController::class, 'adminLogin']);
 Route::post("/coachLogin" ,  [AuthController::class, 'coachLogin']);
 Route::post("/customerLogin" ,  [AuthController::class, 'customerLogin']);
 Route::post("/employeeLogin" ,  [AuthController::class, 'employeeLogin']);
-Route::post("/adminRegister" ,  [AuthController::class, 'adminRegister']);
+Route::post("/unauthorized/customer/create" ,  [CustomersController::class, 'unauthorizedCustomerCreate']);
+// Route::post("/adminRegister" ,  [AuthController::class, 'adminRegister']);
 
 Route::group(['middleware' => ['auth:sanctum']],function(){
     Route::post("/adminAuthorize" ,  [AuthController::class, 'adminAuthorize']);
@@ -44,6 +45,8 @@ Route::group(['middleware' => ['auth:sanctum']],function(){
     Route::post("/coachAuthorize" ,  [AuthController::class, 'coachAuthorize']);
     Route::post("/customerAuthorize" ,  [AuthController::class, 'customerAuthorize']);
     Route::post("/employeeAuthorize" ,  [AuthController::class, 'employeeAuthorize']);
+    Route::post("/userUpdate" ,  [AuthController::class, 'userUpdate']);
+    Route::post("/resetPw" ,  [AuthController::class, 'changePw']);
 
     // Branches APIs
     Route::post("/branchBulkDelete" ,  [BranchesController::class, 'deleteBranch']);
@@ -80,6 +83,7 @@ Route::group(['middleware' => ['auth:sanctum']],function(){
 
     // Customers APIs
     Route::get("/customers" ,  [CustomersController::class, 'getCustomers']);
+    Route::get("/customersInputList" ,  [CustomersController::class, 'customersInputList']);
     Route::get("/customersReservedOnly" ,  [CustomersController::class, 'getReservedOnlyCustomers']);
     Route::post("/validateCustomer" ,  [CustomersController::class, 'validateCustomer']);
     Route::get("/customerActiveSubscriptions/{id}" ,  [CustomersController::class, 'getCustomerActiveSubscriptions']);
@@ -126,8 +130,11 @@ Route::group(['middleware' => ['auth:sanctum']],function(){
 
     // Academies APIs
     Route::get("/academies" ,  [AcademiesController::class, 'getAcademies']);
+    Route::get("/academy/{id}" ,  [AcademiesController::class, 'getAcademyDetails']);
+    Route::put("/academy/update/{id}" ,  [AcademiesController::class, 'updateAcademy']);
     Route::get("/academiesOfBranch/{branchId}" ,  [AcademiesController::class, 'getAcademiesInBranch']);
     Route::post("/createAcademy" ,  [AcademiesController::class, 'createAcademy']);
+    Route::post("/academyBulkDelete" ,  [AcademiesController::class, 'deleteAcademies']);
 
 
     // Orders APIs

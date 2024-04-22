@@ -150,6 +150,37 @@ class AuthController extends Controller
         }
     }
 
+    public function userUpdate(Request $request){
+        $user = $request->user();
+        if ($user instanceof Employee) {
+            $fields = $request->validate([
+                'name' => 'required|string',
+                'email' => [
+                    Rule::unique('employees')->ignore($user->id)
+                ],
+                'phone' => 'required|string',
+            ]);
+            if($user){
+                $user->update($fields);
+            }
+        }
+        else{
+            $fields = $request->validate([
+                'name' => 'required|string',
+                'email' => [
+                    Rule::unique('employees')->ignore($user->id)
+                ],
+                'username' => 'required|string',
+            ]);
+            if($user){
+                $user->update($fields);
+            }
+        }
+        return response()->json(['user'=> $user],200);
+    }
+
+
+
     public function getUser(Request $request){
         $user = $request->user();
         return response()->json(['user'=> $user],200);

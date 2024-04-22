@@ -58,6 +58,7 @@ class EmployeesController extends Controller
     public function createEmployee(Request $request){
         $user = $request->user();
         if($user->type == 'admin' || $user->type == 'Employee'){
+            $created_by = $user->name;
             $validatedData = $request->validate([
                 'name' => 'required|string',
                 'email' => 'required|email|unique:employees,email',
@@ -67,6 +68,7 @@ class EmployeesController extends Controller
                 'type' => 'nullable',
                 'salary' => 'required|numeric',
             ]);
+            $validatedData['created_by'] = $created_by;
             $validatedData['password'] = bcrypt($validatedData['password']);
             $employee = Employee::create($validatedData);
             // Attach the employee to branches
@@ -152,6 +154,7 @@ class EmployeesController extends Controller
                 // Detach the relationships
                 $employee->branches()->detach();
                 $employee->roles()->detach();
+                $employee->salaries()->delete();
                 // Delete the Employee model
                 $employee->delete();
             }

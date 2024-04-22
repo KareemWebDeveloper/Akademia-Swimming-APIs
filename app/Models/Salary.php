@@ -19,6 +19,7 @@ class Salary extends Model
         'bonus',
         'discount',
         'notes',
+        'from_date',
     ];
 
     public function coach()

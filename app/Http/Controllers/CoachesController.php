@@ -73,6 +73,7 @@ class CoachesController extends Controller
     public function createCoach(Request $request){
         $user = $request->user();
         if($user->type == 'admin' || $user->type == 'Employee'){
+            $created_by = $user->name;
             $validatedData = $request->validate([
                 'name' => 'required|string',
                 'email' => 'required|email|unique:coaches,email',
@@ -83,6 +84,7 @@ class CoachesController extends Controller
                 'hours_worked' => 'nullable|numeric',
             ]);
             $validatedData['password'] = bcrypt($validatedData['password']);
+            $validatedData['created_by'] = $created_by;
             $coach = Coach::create($validatedData);
             // Attach the coach to branches
             if($request->input('branchIds')){
@@ -150,6 +152,7 @@ class CoachesController extends Controller
                 // Detach the relationships
                 $coach->branches()->detach();
                 $coach->salaries()->delete();
+                $coach->attendances()->delete();
                 // Delete the coach model
                 $coach->delete();
             }
