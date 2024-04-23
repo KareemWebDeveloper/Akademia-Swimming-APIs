@@ -101,7 +101,7 @@ class SalariesController extends Controller
                 'bonus'=> isset($fields['bonus']) ? $fields['bonus'] : 0,
                 'discount' => isset($fields['discount']) ? $fields['discount'] : 0,
                 'notes' => isset($fields['notes']) ? $fields['notes'] : null,
-                'date_from' => $coachLastPaidDate,
+                'from_date' => $coachLastPaidDate,
             ]);
             $coach->update([
                 'last_paid_date' => $currentDate,
