@@ -107,8 +107,8 @@ class CustomersController extends Controller
         if($user->type == 'admin' || $user->type == 'Employee'){
             $validatedData = $request->validate([
                 'customer_name' => 'required|string',
-                'customer_email' => 'required|email|unique:customers,customer_email',
-                'customer_address' => 'required|string',
+                'customer_email' => 'nullable|email|unique:customers,customer_email',
+                'customer_address' => 'nullable|string',
                 'birthdate' => 'date|nullable',
                 'customer_phone' => 'required|string|unique:customers,customer_phone',
                 'gender' => 'nullable|string',
@@ -139,8 +139,8 @@ class CustomersController extends Controller
         if($user->type == 'admin' || $user->type == 'Employee'){
             $validatedData = $request->validate([
                 'customer_name' => 'required|string',
-                'customer_email' => 'required|email|unique:customers,customer_email',
-                'customer_address' => 'required|string',
+                'customer_email' => 'nullable|email|unique:customers,customer_email',
+                'customer_address' => 'nullable|string',
                 'birthdate' => 'date|nullable',
                 'customer_phone' => 'required|string|unique:customers,customer_phone',
                 'gender' => 'nullable|string',
